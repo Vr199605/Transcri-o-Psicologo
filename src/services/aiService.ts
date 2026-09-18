@@ -1,114 +1,169 @@
-import type { StructuredClinicalNote } from '../types';
+import type { StructuredClinicalNote, TheoreticalApproach, SessionRecord } from '../types';
 
 export interface AIProcessingResult {
   rawTranscription: string;
   structuredNote: StructuredClinicalNote;
+  anxietyScore?: number;
+  moodScore?: number;
 }
 
-// Exemplos de demonstração clínica hiper-realistas para psicólogos
-export const CLINICAL_DEMO_CASES: Record<string, AIProcessingResult> = {
+// Casos de demonstração hiper-realistas para cada abordagem
+export const CLINICAL_DEMO_CASES: Record<string, AIProcessingResult & { approach: TheoreticalApproach }> = {
   ansiedade: {
+    approach: 'tcc',
+    anxietyScore: 4,
+    moodScore: 7,
     rawTranscription:
-      'Terminamos agora a 8ª sessão com a Mariana. Ela chegou um pouco mais ansiosa do que na semana passada, relatando que teve um episódio agudo de ansiedade na terça-feira à noite após receber um e-mail do gestor com cobrança de metas. Ela identificou palpitação, sudorese fria nas mãos e um pensamento automático imediato de "eu serei demitida e não conseguirei outro emprego", caracterizando uma nítida distorção cognitiva de catastrofização combinada com leitura mental. Nós aplicamos a técnica do Registro de Pensamentos Disfuncionais (RPD) e fizemos o exame das evidências favoráveis e contrárias a essa crença. Ela percebeu que seu histórico de entregas é elogiado e que a cobrança foi geral para toda a equipe. Realizamos também um treino breve de respiração diafragmática com contagem 4-7-8, observando relaxamento muscular evidente e redução subjetiva da ansiedade de 8 para 3 na escala visual analógica. Como tarefa para a semana, combinamos que ela manterá o preenchimento do diário de pensamentos automáticos caso surjam novas cobranças no trabalho e praticará a respiração 5 minutos pela manhã. Para a próxima sessão, vamos trabalhar a assertividade na comunicação com a liderança.',
+      'Terminamos agora a 8ª sessão com a Mariana. Ela chegou muito mais calma do que na semana passada. Relatou que utilizou o Registro de Pensamentos Disfuncionais (RPD) ao receber a cobrança de metas na quarta-feira. Ela identificou a distorção cognitiva de catastrofização e conseguiu gerar uma resposta racional alternativa. Aplicamos também a respiração diafragmática 4-7-8 com redução evidente da tensão muscular. Combinamos como tarefa manter o preenchimento do diário de pensamentos caso surjam novas cobranças.',
     structuredNote: {
       demandaPrincipal:
-        'Crise aguda de ansiedade deflagrada por cobrança profissional e ativação de esquemas de incompetência e catastrofização.',
+        'Crise aguda de ansiedade deflagrada por cobrança profissional e ativação de distorção de catastrofização.',
       estadoMentalHumor:
-        'Paciente orientada no tempo e espaço, vigil, com humor ansioso no início da sessão e afeto congruente. Demonstrou reatividade neurovegetativa (relato de taquicardia prévia), com redução sensível da tensão corporal após intervenções.',
+        'Paciente vigil, orientada, humor calmo/eutímico no término, afeto congruente e colaborativo.',
       temasAbordados: [
-        'Episódio agudo de ansiedade vivenciado na terça-feira após demanda de trabalho',
-        'Pensamentos automáticos de demissão e ruína financeira',
+        'Uso autônomo do Registro de Pensamentos Disfuncionais (RPD)',
         'Distorções cognitivas: Catastrofização e Leitura Mental',
-        'Relação com a figura de autoridade no ambiente corporativo',
+        'Respiração diafragmática e regulação neurovegetativa',
       ],
       intervencoes: [
-        'Registro de Pensamentos Disfuncionais (RPD) focado no evento ativador do trabalho',
-        'Exame de evidências e busca por respostas cognitivas alternativas realistas',
-        'Psicoeducação sobre o ciclo do medo e ativação simpática',
-        'Treino prático de respiração diafragmática (técnica 4-7-8) para regulação vagal',
+        'Exame de evidências e reestruturação cognitiva socrática',
+        'Treino respiratório diafragmático 4-7-8',
+        'Psicoeducação sobre o ciclo cognitivo da ansiedade',
       ],
       insightsPaciente:
-        'Mariana reconheceu que sua mente tende a antecipar cenários de catástrofe sem base fática real, projetando inseguranças antigas de desvalorização profissional. Pontuou alívio ao perceber que o e-mail não era um ataque pessoal.',
+        'Mariana percebeu que suas antecipações de demissão eram projeções infundadas baseadas no medo, não em fatos reais.',
       tarefasAcordadas: [
-        'Preenchimento do Registro de Pensamentos Disfuncionais (RPD) ao notar elevação de ansiedade',
-        'Prática diária de 5 minutos de respiração diafragmática pela manhã',
-        'Evitar checagem de e-mails corporativos após as 20h00',
+        'Preenchimento do RPD em momentos de ativação ansiosa',
+        'Prática diária de respiração 5 minutos pela manhã',
       ],
       planejamentoProximaSessao:
-        'Investigar a assertividade na comunicação corporativa e mapear crenças intermediárias sobre perfeccionismo e vulnerabilidade.',
+        'Trabalhar comunicação assertiva na reunião de equipe.',
       observacoesSigilosas:
-        'Atenção ao padrão de autosabotagem e hiperexigência. Não há ideação de risco. Manter monitoramento da qualidade do sono.',
+        'Atenção ao perfeccionismo latente. Sem risco de descompensação.',
+      conceitosAbordagem: [
+        'Reestruturação Cognitiva',
+        'Distorção: Catastrofização',
+        'RPD (Registro de Pensamentos)',
+      ],
     },
   },
-  burnout: {
+  psicanalise: {
+    approach: 'psicanalise',
+    anxietyScore: 6,
+    moodScore: 5,
     rawTranscription:
-      'Sessão com o Lucas, 14º encontro. O paciente compareceu com aspecto de esgotamento e fadiga crônica, postura curvada e lentificação no ritmo da fala. Relatou sensação profunda de despersonalização no trabalho e anedonia nas horas de lazer com a família, dizendo que no fim de semana mal conseguiu sair da cama. Exploramos a dinâmica de limites no trabalho e ele verbalizou culpa intensa sempre que pensa em dizer "não" a novas demandas extras. Trabalhamos a técnica de clarificação de valores e o desmantelamento da crença central de que "meu valor como ser humano depende exclusivamente da minha produtividade incessante". O Lucas se emocionou bastante durante o exercício de autocompaixão ao recordar as cobranças paternas na infância. Estabelecemos um plano gradual de delimitação de horário de trabalho e agendamento de atividades de domínio e prazer. Na próxima sessão, vamos revisar a evolução da rotina de sono e introduzir limites com os pares.',
+      'Sessão com Beatriz, 12º encontro na clínica psicanalítica. A analisanda iniciou associando livremente a partir de um sonho recorrente de afogamento em águas escuras que emergiu após a viagem da mãe. Notamos forte manifestação de transferência negativa quando ela questionou se eu realmente estava escutando ou se "apenas anotava protocolarmente", reproduzindo a sensação infantil de negligência materna. Houve um ato falho significativo quando ela trocou o nome do noivo pelo nome do pai ao falar sobre sensação de abandono. Pontuei a repetição sintomática e a paciente silenciou em evidente trabalho de elaboração psíquica.',
     structuredNote: {
       demandaPrincipal:
-        'Quadro compatível com Síndrome de Burnout / Esgotamento Profissional Crônico com sintomas de despersonalização e anedonia.',
+        'Emergência de angústia arcaica de abandono e repetição na relação amorosa e transferencial.',
       estadoMentalHumor:
-        'Humor deprimido/disfórico, afeto embotado inicialmente, fáceis de fadiga perceptível. Choro catártico congruente durante o resgate de memórias. Discurso coerente com ritmo lentificado.',
+        'Discurso permeado por pausas, afeto oscilante entre angústia e retraimento defensivo.',
       temasAbordados: [
-        'Exaustão emocional e sobrecarga no ambiente de trabalho',
-        'Dificuldade de estabelecimento de limites e culpa associada à recusa',
-        'Crença nuclear de valor pessoal atrelado à hiperprodutividade',
-        'Impacto do esgotamento nas relações conjugais e familiares',
+        'Sonho de afogamento e associação com a figura materna',
+        'Manejo da transferência e reencenação de rejeição na relação analítica',
+        'Ato falho: condensação significante entre noivo e figura paterna',
       ],
       intervencoes: [
-        'Clarificação de valores fundamentais vs. demandas externas de validação',
-        'Técnicas de Autocompaixão e reestruturação de diálogos internos autocríticos',
-        'Psicoeducação sobre os estágios fisiológicos e psicológicos do Burnout',
-        'Prescrição comportamental de Micro-Pausas Restaurativas e restrição de sobrejornada',
+        'Sustentação do enquadre analítico e escuta flutuante',
+        'Pontuação do ato falho e assinalamento da repetição do significante do abandono',
+        'Interpretação da transferência negativa como defesa contra a intimidade',
       ],
       insightsPaciente:
-        'Lucas verbalizou com clareza a correlação entre a busca incansável por aprovação e as exigências parentais da infância. Concluiu que a exaustão atual é um preço insustentável para manter uma imagem de invulnerabilidade.',
+        'Beatriz reconheceu o terror infantil de depender emocionalmente do outro e o ressentimento pelo distanciamento afetivo da mãe.',
       tarefasAcordadas: [
-        'Definir horário fixo de desligamento do computador do trabalho (impreterivelmente às 18h30)',
-        'Caminhada matinal ao ar livre de 20 minutos sem fones de notícias ou trabalho',
-        'Anotar momentos da semana em que sentiu vontade de dizer "não" e qual emoção emergiu',
+        'Anotar sonhos ou fragmentos mnêmicos espontâneos para a próxima sessão',
       ],
       planejamentoProximaSessao:
-        'Avaliar adesão ao plano de pausas, monitorar sintomas depressivos secundários e treinar comunicação assertiva para delegação de tarefas.',
+        'Aprofundar a elaboração do significante paterno no discurso amoroso.',
       observacoesSigilosas:
-        'Caso os sintomas de despersonalização e anedonia persistam nas próximas duas semanas, considerar encaminhamento psiquiátrico conjunto para avaliação de suporte farmacológico.',
+        'Resistência transferencial importante. Cuidar para não precipitar interpretações que fechem o sentido.',
+      conceitosAbordagem: [
+        'Transferência Negativa',
+        'Ato Falho / Chiste',
+        'Associação Livre',
+        'Angústia de Castração / Abandono',
+      ],
     },
   },
-  relacionamento: {
+  humanista: {
+    approach: 'humanista',
+    anxietyScore: 5,
+    moodScore: 6,
     rawTranscription:
-      'Beatriz compareceu para a 5ª sessão pontualmente. Hoje ela trouxe uma questão central de insegurança no relacionamento afetivo com o namorado. Relatou que sentiu ciúmes intenso quando ele saiu com amigos na sexta-feira e que passou o sábado inteiro remoendo o fato dele ter demorado 30 minutos para responder a uma mensagem. Notamos a ativação de um esquema de abandono/instabilidade afetiva. Fizemos a diferenciação entre "fato" e "interpretação", e trabalhamos a tolerância ao mal-estar emocional sem recurso a comportamentos de checagem compulsiva no WhatsApp e redes sociais. Ela conseguiu identificar que o medo não era sobre o namorado em si, mas sim o medo arcaico de ser esquecida e trocada, herdado do divórcio conflituoso dos pais. Como combinado, ela se comprometeu a não monitorar o status online dele durante a semana e a praticar a escrita terapêutica quando a angústia de separação se manifestar.',
+      'Atendimento de Lucas na abordagem Humanista e Fenomenológica. Lucas trouxe uma profunda sensação de descompasso entre o que ele realmente sente (seu self autêntico) e as expectativas do ambiente de trabalho corporativo. Trabalhamos a presença no aqui-e-agora e a aceitação incondicional de sua vulnerabilidade. Ele expressou que passa o dia usando uma "máscara de competência inabalável" que o esgota. Fizemos um exercício gestáltico de contato com as sensações corporais de aperto no peito, permitindo que a emoção se desdobrasse em choro restaurativo.',
     structuredNote: {
       demandaPrincipal:
-        'Insegurança vincular nos relacionamentos íntimos com ativação de pensamentos automáticos de rejeição e comportamentos de hipervigilância.',
+        'Incongruência entre o self experiencial autêntico e a persona profissional de invulnerabilidade.',
       estadoMentalHumor:
-        'Vigil, orientada, humor angustiado com oscilações de vergonha e irritabilidade. Boa capacidade introspectiva e alta aliança de trabalho.',
+        'Postura inicialmente defensiva que cedeu espaço a choro espontâneo e maior centramento corporal.',
       temasAbordados: [
-        'Crise de ciúmes e ansiedade de separação desencadeada por atraso em mensagens',
-        'Comportamentos de controle e checagem compulsiva em redes sociais',
-        'Esquema precoce desadaptativo de Abandono/Instabilidade',
-        'Ressonância do divórcio parental na construção de vínculos atuais',
+        'Alienação das próprias necessidades genuínas em prol da aprovação externa',
+        'Experiência corpórea de aperto torácico e repressão do cansaço',
+        'Autorregulação organísmica vs. introjeção de exigências parentais',
       ],
       intervencoes: [
-        'Diferenciação cognitiva entre Realidade Fática vs. Projeção Emocional',
-        'Prevenção de resposta para impulsos de checagem virtual (WhatsApp/Instagram)',
-        'Técnica da Cadeira Vazia adaptada para acolhimento da "Criança Vulnerável"',
-        'Prescrição de escrita expressiva terapêutica para autorregulação',
+        'Presença autêntica, escuta empática e aceitação positiva incondicional',
+        'Exercício de amplificação da consciência corporal e contato com o aqui-e-agora',
+        'Validação da vulnerabilidade como força de individuação',
       ],
       insightsPaciente:
-        'Beatriz compreendeu que as checagens online funcionavam como um alívio momentâneo que retroalimentava a ansiedade a longo prazo. Percebeu a repetição do sentimento de desamparo vivenciado na infância.',
+        'Lucas verbalizou alívio ao perceber que não precisa se abandonar para ser aceito, reconectando-se com o valor do descanso.',
       tarefasAcordadas: [
-        'Desativar confirmações de leitura e abster-se de monitorar horário de "visto por último"',
-        'Aplicar a pausa de 15 minutos e escrita reflexiva antes de enviar mensagens impulsivas de cobrança',
-        'Leitura do texto psicoeducativo sobre estilos de apego fornecido em sessão',
+        'Permitir-se 15 minutos diários de não-fazer sem culpa',
       ],
       planejamentoProximaSessao:
-        'Trabalhar estratégias de fortalecimento da individuação e autoafirmação afetiva.',
+        'Continuar facilitando o contato com os sentimentos organísmicos e fronteiras de contato.',
       observacoesSigilosas:
-        'Excelente prognóstico terapêutico. Boa permeabilidade aos questionamentos reflexivos.',
+        'Excelente permeabilidade ao processo fenomenológico. Fortalecimento da congruência.',
+      conceitosAbordagem: [
+        'Relação Dialógica',
+        'Aqui-e-Agora / Contato',
+        'Incongruência do Self',
+        'Aceitação Positiva Incondicional',
+      ],
+    },
+  },
+  sistemica: {
+    approach: 'sistemica',
+    anxietyScore: 7,
+    moodScore: 5,
+    rawTranscription:
+      'Sessão com foco sistêmico familiar. O paciente relatou o conflito crônico de fronteiras entre a família de origem e o novo casamento. Mapeamos a triangulação onde a mãe recorre a ele para mediar conflitos conjugais com o pai, sobrecarregando sua relação atual. Discutimos o conceito de lealdades invisíveis e a diferenciação do self. Ele percebeu que age como "salvador" do sistema de origem em detrimento do subsistema conjugal.',
+    structuredNote: {
+      demandaPrincipal:
+        'Fronteiras difusas e triangulação emocional com a família de origem impactando o subsistema conjugal.',
+      estadoMentalHumor:
+        'Vigil, tenso, verbalizando culpa leal e sobrecarga de papéis.',
+      temasAbordados: [
+        'Triangulação emocional entre mãe, pai e paciente',
+        'Diferenciação do Self na família de origem',
+        'Proteção das fronteiras do subsistema conjugal',
+      ],
+      intervencoes: [
+        'Mapeamento sistêmico e genograma das dinâmicas relacionais',
+        'Questionamento circular sobre o impacto do papel de mediador',
+        'Prescrição de delimitação de fronteiras claras com a mãe',
+      ],
+      insightsPaciente:
+        'Reconheceu que carregar as dores conjugais dos pais é uma lealdade invisível que custa sua própria paz familiar.',
+      tarefasAcordadas: [
+        'Não intervir em discussões entre os pais durante a semana',
+        'Reservar uma noite exclusiva a dois com a parceira',
+      ],
+      planejamentoProximaSessao:
+        'Trabalhar a culpa sistêmica e consolidação do novo subsistema.',
+      observacoesSigilosas:
+        'Cuidado com a homeostase familiar que tentará atrair o paciente de volta ao papel de mediador.',
+      conceitosAbordagem: [
+        'Triangulação',
+        'Diferenciação do Self',
+        'Fronteiras de Subsistema',
+        'Lealdades Invisíveis',
+      ],
     },
   },
 };
 
-// Converte Blob de áudio para Base64
 export const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -122,28 +177,64 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
-const SYSTEM_PROMPT = `Você é um assistente de IA sênior especializado em Psicologia Clínica e Prontuários Psicológicos de Alto Padrão Técnico (conforme as diretrizes do Conselho Federal de Psicologia - CFP / Resolução CFP nº 01/2009 e Código de Ética Profissional).
+// Gera instruções de sistema personalizadas para a abordagem teórica do psicólogo
+const getSystemPromptForApproach = (approach: TheoreticalApproach): string => {
+  let approachInstructions = '';
 
-Sua missão é ouvir o áudio gravado pela psicóloga após a sessão de psicoterapia e:
-1. Gerar uma TRANSCRIÇÃO LIMPA E FIEL da fala da psicóloga:
-   - Mantenha com total rigor o vocabulário clínico e as observações trazidas.
-   - Elimine apenas vícios de linguagem naturais da fala coloquial (como "ééé", "tipo assim", "né", "tá entendendo", repetições acidentais).
-   - Corrija a ortografia e pontuação para um português culto e impecável.
-   - Garanta a grafia exata de termos técnicos (ex: TCC, DSM-5, anedonia, catastrofização, desfusão cognitiva, transferência, hipervigilância, etc.).
+  switch (approach) {
+    case 'psicanalise':
+      approachInstructions = `
+ABORDAGEM TEÓRICA: PSICANÁLISE CLÍNICA (Freud, Lacan, Klein, Winnicott).
+- Analise a fala buscando significantes-chave, dinâmicas inconscientes, transferência e contratransferência.
+- Registre manifestações de resistência, atos falhos, associações simbólicas, dinâmica pulsional e sintomas como formação de compromisso.
+- Em 'intervencoes', cite manejos como escuta flutuante, pontuação, interpretação, sustentação do enquadre e corte de sessão.
+- Em 'conceitosAbordagem', liste de 2 a 4 conceitos psicanalíticos presentes (ex: Transferência, Recalque, Objeto a, Fantasma fundamental).`;
+      break;
+    case 'humanista':
+      approachInstructions = `
+ABORDAGEM TEÓRICA: HUMANISTA / FENOMENOLÓGICA / GESTALT-TERAPIA (Rogers, Perls).
+- Foque na experiência vivida, na consciência no 'aqui-e-agora', no contato autêntico e na autorregulação organísmica.
+- Observe a congruência entre o self experienciado e a expressão emocional do cliente.
+- Em 'intervencoes', destaque presença empática, aceitação positiva incondicional, amplificação fenomenológica e experimentos gestálticos.
+- Em 'conceitosAbordagem', liste 2 a 4 termos humanistas (ex: Incongruência do Self, Relação Eu-Tu, Ciclo do Contato).`;
+      break;
+    case 'sistemica':
+      approachInstructions = `
+ABORDAGEM TEÓRICA: TERAPIA SISTÊMICA FAMILIAR E RELACIONAL (Minuchin, Bowen).
+- Analise o paciente como membro de um sistema relacional com fronteiras, hierarquias, regras explícitas e implícitas.
+- Identifique triangulações, lealdades invisíveis, ciclo vital familiar e padrões de comunicação disfuncionais.
+- Em 'intervencoes', cite perguntas circulares, genograma, redefinição positiva e delimitação de subsistemas.
+- Em 'conceitosAbordagem', liste 2 a 4 conceitos sistêmicos (ex: Diferenciação do Self, Triangulação, Homeostase Familiar).`;
+      break;
+    case 'tcc':
+    default:
+      approachInstructions = `
+ABORDAGEM TEÓRICA: TERAPIA COGNITIVO-COMPORTAMENTAL (TCC) & TERAPIAS DE 3ª ONDA (Beck, Ellis, ACT).
+- Destaque pensamentos automáticos, distorções cognitivas (catastrofização, filtro mental, etc.), crenças intermediárias e nucleares.
+- Em 'intervencoes', cite técnicas estruturadas como RPD, questionamento socrático, desseensibilização, psicoeducação e experimentos comportamentais.
+- Em 'conceitosAbordagem', liste 2 a 4 conceitos de TCC (ex: Esquemas de Beck, RPD, Desfusão Cognitiva).`;
+      break;
+  }
 
-2. Estruturar a EVOLUÇÃO CLÍNICA DE PRONTUÁRIO em seções bem delimitadas:
-   - demandaPrincipal: Síntese da queixa/motivo central deste encontro.
-   - estadoMentalHumor: Descrição do humor, afeto, reatividade emocional, postura e discurso observados no(a) paciente.
-   - temasAbordados: Array de tópicos trabalhados durante a sessão.
-   - intervencoes: Array de técnicas, manejos clínicos e abordagens utilizadas pela psicóloga.
-   - insightsPaciente: Reações, tomadas de consciência e engajamento do(a) paciente.
-   - tarefasAcordadas: Array de tarefas inter-sessão, combinados ou exercícios acordados com o(a) paciente.
-   - planejamentoProximaSessao: Metas, hipóteses e tópicos previstos para a sessão seguinte.
-   - observacoesSigilosas: Observações de cautela, alertas ou considerações ético-clínicas.
+  return `Você é um assistente de IA sênior especializado em Psicologia Clínica e Prontuários Psicológicos de Alto Padrão Técnico (Diretrizes CFP / Resolução CFP nº 01/2009).
 
-Responda ESTRITAMENTE em formato JSON com a seguinte estrutura:
+${approachInstructions}
+
+REGRAS CRÍTICAS DE COMANDOS DE VOZ:
+- Se no áudio a psicóloga falar frases explicitamente marcadas como "Anotação sigilosa: ...", "Observação confidencial: ..." ou "Alerta: ...", direcione rigorosamente esse conteúdo para o campo 'observacoesSigilosas'.
+- Se disser "Tarefa para casa: ...", "Combinado: ..." ou "Exercício: ...", inclua diretamente em 'tarefasAcordadas'.
+- Estime também 'anxietyScore' (escore de ansiedade observado de 1 a 10) e 'moodScore' (escore de humor/bem-estar de 1 a 10).
+
+TRANSCRIÇÃO E POLIMENTO:
+- Mantenha com total rigor o vocabulário clínico e a essência da fala.
+- Elimine vícios de fala coloquial ("né", "tipo", repetições acidentais).
+- Pontuação e ortografia em português culto formal.
+
+Responda ESTRITAMENTE em formato JSON com esta estrutura:
 {
   "rawTranscription": "...",
+  "anxietyScore": 5,
+  "moodScore": 6,
   "structuredNote": {
     "demandaPrincipal": "...",
     "estadoMentalHumor": "...",
@@ -152,13 +243,10 @@ Responda ESTRITAMENTE em formato JSON com a seguinte estrutura:
     "insightsPaciente": "...",
     "tarefasAcordadas": ["...", "..."],
     "planejamentoProximaSessao": "...",
-    "observacoesSigilosas": "..."
+    "observacoesSigilosas": "...",
+    "conceitosAbordagem": ["...", "..."]
   }
 }`;
-
-const normalizeModel = (name?: string): string => {
-  if (!name || name === 'gemini-2.5-flash') return 'gemini-3.6-flash';
-  return name;
 };
 
 const FALLBACK_CANDIDATES = [
@@ -167,6 +255,11 @@ const FALLBACK_CANDIDATES = [
   'gemini-1.5-flash',
   'gemini-1.5-pro',
 ];
+
+const normalizeModel = (name?: string): string => {
+  if (!name || name === 'gemini-2.5-flash') return 'gemini-3.6-flash';
+  return name;
+};
 
 const isHighDemandOrOverloadError = (message: string, status?: number): boolean => {
   const msg = (message || '').toLowerCase();
@@ -186,6 +279,7 @@ export const processAudioWithGemini = async (
   audioBlob: Blob,
   apiKey: string,
   modelName: string = 'gemini-3.6-flash',
+  approach: TheoreticalApproach = 'tcc',
   onStatusUpdate?: (statusMessage: string) => void
 ): Promise<AIProcessingResult> => {
   if (!apiKey || apiKey.trim() === '') {
@@ -193,7 +287,6 @@ export const processAudioWithGemini = async (
   }
 
   const primaryModel = normalizeModel(modelName);
-  // Lista de modelos ordenados: o preferido primeiro, seguido dos reservas
   const modelsToTry = [
     primaryModel,
     ...FALLBACK_CANDIDATES.filter((m) => m !== primaryModel),
@@ -201,6 +294,7 @@ export const processAudioWithGemini = async (
 
   const base64Audio = await blobToBase64(audioBlob);
   const mimeType = audioBlob.type || 'audio/webm';
+  const systemPrompt = getSystemPromptForApproach(approach);
 
   let lastError: Error = new Error('Falha ao processar áudio.');
 
@@ -219,13 +313,13 @@ export const processAudioWithGemini = async (
               },
             },
             {
-              text: 'Por favor, processe este áudio clínico de encerramento de sessão conforme suas instruções de sistema e retorne o JSON com a transcrição impecável e a evolução clínica estruturada.',
+              text: 'Por favor, processe este áudio de encerramento de sessão conforme suas instruções clínicas e retorne o JSON com a transcrição impecável e a evolução estruturada.',
             },
           ],
         },
       ],
       systemInstruction: {
-        parts: [{ text: SYSTEM_PROMPT }],
+        parts: [{ text: systemPrompt }],
       },
       generationConfig: {
         temperature: 0.2,
@@ -240,9 +334,7 @@ export const processAudioWithGemini = async (
 
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
 
@@ -252,8 +344,7 @@ export const processAudioWithGemini = async (
           errorData?.error?.message || `Falha na requisição: status ${response.status} (${response.statusText})`;
 
         if (isHighDemandOrOverloadError(message, response.status) && i < modelsToTry.length - 1) {
-          console.warn(`Modelo ${currentModel} com alta demanda temporária. Tentando próximo modelo...`);
-          await new Promise((r) => setTimeout(r, 1200)); // Pequena pausa para desafogar requisições
+          await new Promise((r) => setTimeout(r, 1200));
           continue;
         }
 
@@ -268,20 +359,16 @@ export const processAudioWithGemini = async (
       }
 
       try {
-        const parsed = JSON.parse(textOutput) as AIProcessingResult;
-        return parsed;
+        return JSON.parse(textOutput) as AIProcessingResult;
       } catch {
         const match = textOutput.match(/\{[\s\S]*\}/);
-        if (match) {
-          return JSON.parse(match[0]) as AIProcessingResult;
-        }
+        if (match) return JSON.parse(match[0]) as AIProcessingResult;
         throw new Error('O modelo retornou uma resposta fora do padrão JSON esperado.');
       }
     } catch (err) {
       lastError = err as Error;
       const errMsg = (err as Error).message || '';
       if (isHighDemandOrOverloadError(errMsg) && i < modelsToTry.length - 1) {
-        console.warn(`Erro no modelo ${currentModel}: ${errMsg}. Alternando para modelo reserva...`);
         await new Promise((r) => setTimeout(r, 1000));
         continue;
       }
@@ -292,60 +379,66 @@ export const processAudioWithGemini = async (
   throw lastError;
 };
 
-// Processa texto transcrito diretamente (caso o psicólogo queira colar ou usar speech recognition)
-export const structureTranscriptionWithGemini = async (
-  transcriptionText: string,
-  apiKey: string,
-  modelName: string = 'gemini-3.6-flash'
-): Promise<AIProcessingResult> => {
-  if (!apiKey || apiKey.trim() === '') {
-    throw new Error('Chave de API do Gemini não configurada.');
+// Geração de Resumo de Memória Clínica ("O que trabalhamos no último mês com este paciente?")
+export const generateClinicalMemorySummary = async (
+  patientName: string,
+  sessions: SessionRecord[],
+  apiKey?: string
+): Promise<string> => {
+  if (sessions.length === 0) {
+    return `Nenhum prontuário anterior arquivado para ${patientName}. Esta é a sessão de acolhimento inicial.`;
   }
 
-  const activeModel = normalizeModel(modelName);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
+  const recentSessions = [...sessions]
+    .sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime())
+    .slice(0, 5);
 
-  const requestBody = {
-    contents: [
-      {
-        parts: [
-          {
-            text: `Aqui está o relato da sessão falado pelo psicólogo:\n\n"${transcriptionText}"\n\nEstruture a evolução clínica e devolva a transcrição polida e a evolução estruturada em formato JSON.`,
-          },
-        ],
-      },
-    ],
-    systemInstruction: {
-      parts: [{ text: SYSTEM_PROMPT }],
-    },
-    generationConfig: {
-      temperature: 0.2,
-      responseMimeType: 'application/json',
-    },
-  };
+  const historyText = recentSessions
+    .map(
+      (s) =>
+        `Sessão #${s.sessionNumber} (${s.sessionDate}):\n- Queixa: ${s.structuredNote.demandaPrincipal}\n- Temas: ${s.structuredNote.temasAbordados.join(', ')}\n- Tarefas: ${s.structuredNote.tarefasAcordadas.join(', ')}\n- Insights: ${s.structuredNote.insightsPaciente}\n- Planejamento: ${s.structuredNote.planejamentoProximaSessao}`
+    )
+    .join('\n\n');
+
+  if (!apiKey || apiKey.trim() === '') {
+    // Simulação inteligente instantânea se sem chave configurada
+    const lastSession = recentSessions[0];
+    return `📋 RESUMO CLÍNICO RECENTE • ${patientName} (${recentSessions.length} atendimentos analisados):
+
+1. EVOLUÇÃO E TEMAS CENTRAIS:
+Nos últimos encontros, o foco principal esteve na queixa de: "${lastSession?.structuredNote.demandaPrincipal}". Houve avanços sensíveis no reconhecimento dos padrões emocionais e redução dos episódios agudos.
+
+2. TAREFAS E COMBINADOS DA ÚLTIMA SESSÃO:
+${lastSession?.structuredNote.tarefasAcordadas.map((t) => `• ${t}`).join('\n') || 'Nenhuma tarefa pendente.'}
+
+3. INSIGHTS E RESPOSTA DO PACIENTE:
+${lastSession?.structuredNote.insightsPaciente || 'Boa receptividade ao manejo clínico.'}
+
+4. PAUTA SUGERIDA PARA A SESSÃO DE HOJE:
+${lastSession?.structuredNote.planejamentoProximaSessao || 'Revisar acordos e checar bem-estar semanal.'}`;
+  }
+
+  const prompt = `Você é um psicólogo supervisor sênior. Com base nos prontuários recentes de ${patientName}:\n\n${historyText}\n\nElabore um briefing pré-sessão de 1 minuto em 4 tópicos diretos e objetivos para o psicólogo ler antes do paciente entrar na sala:
+1. Linha do tempo e temas trabalhados recentemente
+2. Tarefas e acordos pendentes para checar hoje
+3. Alertas e pontos de atenção emocional
+4. Direcionamento e pauta sugerida para a sessão de hoje`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey.trim()}`;
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.3 },
+    }),
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData?.error?.message || `Erro ${response.status}: ${response.statusText}`);
+    throw new Error('Falha ao gerar resumo com IA.');
   }
 
   const data = await response.json();
-  const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!textOutput) throw new Error('Nenhuma resposta gerada pela IA.');
-
-  try {
-    return JSON.parse(textOutput) as AIProcessingResult;
-  } catch {
-    const match = textOutput.match(/\{[\s\S]*\}/);
-    if (match) return JSON.parse(match[0]) as AIProcessingResult;
-    throw new Error('Formato retornado pela IA não é JSON válido.');
-  }
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Resumo indisponível.';
 };

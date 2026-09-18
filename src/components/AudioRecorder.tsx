@@ -309,31 +309,38 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
         {/* Casos Clínicos de Demonstração (Toque rápido) */}
         <div className="flex flex-col items-start sm:items-end">
-          <div className="flex items-center gap-1.5 text-xs text-stone-400 font-medium mb-1">
+          <div className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-slate-400 font-medium mb-1">
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Casos de Exemplo (1 toque):</span>
+            <span>Casos por Abordagem (1 toque):</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
-              onClick={() => onSelectDemoCase('ansiedade', CLINICAL_DEMO_CASES.ansiedade)}
+              onClick={() => onSelectDemoCase('tcc', CLINICAL_DEMO_CASES.ansiedade)}
               disabled={isProcessing || isRecording}
-              className="px-2.5 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 border border-emerald-200/60 transition cursor-pointer"
+              className="px-2.5 py-1 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/60 dark:border-emerald-800/60 transition cursor-pointer"
             >
-              Ansiedade
+              TCC
             </button>
             <button
-              onClick={() => onSelectDemoCase('burnout', CLINICAL_DEMO_CASES.burnout)}
+              onClick={() => onSelectDemoCase('psicanalise', CLINICAL_DEMO_CASES.psicanalise)}
               disabled={isProcessing || isRecording}
-              className="px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-800 rounded-lg hover:bg-amber-100 border border-amber-200/60 transition cursor-pointer"
+              className="px-2.5 py-1 text-xs font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200/60 dark:border-purple-800/60 transition cursor-pointer"
             >
-              Burnout
+              Psicanálise
             </button>
             <button
-              onClick={() => onSelectDemoCase('relacionamento', CLINICAL_DEMO_CASES.relacionamento)}
+              onClick={() => onSelectDemoCase('humanista', CLINICAL_DEMO_CASES.humanista)}
               disabled={isProcessing || isRecording}
-              className="px-2.5 py-1 text-xs font-medium bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 border border-purple-200/60 transition cursor-pointer"
+              className="px-2.5 py-1 text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200/60 dark:border-blue-800/60 transition cursor-pointer"
             >
-              Vínculo
+              Humanista
+            </button>
+            <button
+              onClick={() => onSelectDemoCase('sistemica', CLINICAL_DEMO_CASES.sistemica)}
+              disabled={isProcessing || isRecording}
+              className="px-2.5 py-1 text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200/60 dark:border-amber-800/60 transition cursor-pointer"
+            >
+              Sistêmica
             </button>
           </div>
         </div>
