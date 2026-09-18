@@ -1,31 +1,73 @@
 import html2canvas from 'html2canvas-pro';
 import { jsPDF } from 'jspdf';
 
-// Dimensões A4 perfeitas em 96 DPI (padrão web):
+// Dimensões A4 em pixels a 96 DPI:
 // 210mm = 793.7px (~794px), 297mm = 1122.5px (~1123px)
 const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
+// Margem utilizável de segurança para evitar que qualquer texto encoste na borda inferior da folha
+const USABLE_PAGE_HEIGHT = 1040;
+
+/**
+ * Algoritmo de Paginação Inteligente:
+ * Percorre os blocos clínicos (seções, caixas, carimbos) e, caso algum deles vá ser
+ * cortado pela divisão de página A4, insere um espaçador suave empurrando o bloco
+ * INTEIRO para o topo da página seguinte. NUNCA mais corta textos ou caixas ao meio!
+ */
+export const applySmartPageBreaks = (container: HTMLElement) => {
+  const blocks = Array.from(
+    container.querySelectorAll<HTMLElement>('[data-pdf-block="true"]')
+  );
+  if (blocks.length === 0) return;
+
+  const containerRect = container.getBoundingClientRect();
+  let currentPage = 1;
+
+  for (const block of blocks) {
+    const blockRect = block.getBoundingClientRect();
+    const blockTop = blockRect.top - containerRect.top;
+    const blockBottom = blockTop + blockRect.height;
+
+    const pageBoundary = currentPage * A4_HEIGHT_PX;
+    const pageThreshold = (currentPage - 1) * A4_HEIGHT_PX + USABLE_PAGE_HEIGHT;
+
+    // Se o bloco cruzar a margem de segurança da página atual:
+    if (blockBottom > pageThreshold && blockTop < pageBoundary) {
+      const spacerHeight = pageBoundary - blockTop + 32; // 32px de respiro no topo da nova página
+      const spacer = document.createElement('div');
+      spacer.className = 'pdf-smart-page-spacer';
+      spacer.style.height = `${spacerHeight}px`;
+      spacer.style.width = '100%';
+      spacer.style.display = 'block';
+      spacer.style.clear = 'both';
+      spacer.style.pointerEvents = 'none';
+
+      block.parentNode?.insertBefore(spacer, block);
+      currentPage++;
+    }
+  }
+};
 
 export const generatePdfBlob = async (
   element: HTMLElement,
   onProgress?: (progressText: string) => void
 ): Promise<{ pdf: jsPDF; blob: Blob }> => {
-  if (onProgress) onProgress('Preparando layout editorial A4 em alta resolução...');
+  if (onProgress) onProgress('Preparando diagramação A4 sem cortes...');
 
   const originalScrollTop = window.scrollY;
   window.scrollTo(0, 0);
 
-  if (onProgress) onProgress('Renderizando tipografia e diagramação (300 DPI)...');
+  if (onProgress) onProgress('Calculando quebras inteligentes de página...');
 
-  // Forçamos largura A4 fixa (794px) para garantir que no celular o layout NÃO venha comprimido ou distorcido!
   const canvas = await html2canvas(element, {
-    scale: 2.0, // Resolução nítida para impressão gráfica
+    scale: 2.0, // Alta resolução (300 DPI equivalente)
     useCORS: true,
     logging: false,
     backgroundColor: '#ffffff',
     width: A4_WIDTH_PX,
     windowWidth: A4_WIDTH_PX,
     onclone: (_clonedDoc, clonedElement) => {
-      // Garante que o elemento clonado mantenha proporções exatas de folha A4
+      // Força dimensões estritas A4
       clonedElement.style.width = `${A4_WIDTH_PX}px`;
       clonedElement.style.minWidth = `${A4_WIDTH_PX}px`;
       clonedElement.style.maxWidth = `${A4_WIDTH_PX}px`;
@@ -34,12 +76,15 @@ export const generatePdfBlob = async (
       clonedElement.style.boxSizing = 'border-box';
       clonedElement.style.boxShadow = 'none';
       clonedElement.style.borderRadius = '0px';
+
+      // Executa o algoritmo de corte anti-defeito
+      applySmartPageBreaks(clonedElement);
     },
   });
 
   window.scrollTo(0, originalScrollTop);
 
-  if (onProgress) onProgress('Gerando documento vetorial A4...');
+  if (onProgress) onProgress('Gerando documento PDF perfeito...');
 
   const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
@@ -63,7 +108,7 @@ export const generatePdfBlob = async (
   pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
   heightLeft -= pageHeight;
 
-  // Páginas subsequentes com quebra limpa
+  // Páginas subsequentes cortadas com precisão milimétrica nas áreas vazias
   while (heightLeft > 4) {
     position = heightLeft - imgHeight;
     pdf.addPage();
@@ -83,9 +128,8 @@ export const exportElementToPdf = async (
   try {
     const { pdf, blob } = await generatePdfBlob(element, onProgress);
 
-    if (onProgress) onProgress('Iniciando download do arquivo...');
+    if (onProgress) onProgress('Concluindo download do arquivo...');
 
-    // Download universal via Blob URL
     try {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

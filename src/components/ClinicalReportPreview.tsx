@@ -642,7 +642,7 @@ Transcrição literal arquivada:
             {/* CORPO CLÍNICO DO PRONTUÁRIO */}
             <div style={{ fontSize: '13px', lineHeight: '1.65', color: '#1e293b' }}>
               {/* 1. Demanda Principal */}
-              <div style={{ marginBottom: '20px' }}>
+              <div data-pdf-block="true" style={{ marginBottom: '20px' }}>
                 <div style={{ marginBottom: '6px' }}>
                   <span
                     style={{
@@ -665,7 +665,7 @@ Transcrição literal arquivada:
               </div>
 
               {/* 2. Exame do Estado Mental e Humor */}
-              <div style={{ marginBottom: '20px' }}>
+              <div data-pdf-block="true" style={{ marginBottom: '20px' }}>
                 <div style={{ marginBottom: '6px' }}>
                   <span
                     style={{
@@ -688,7 +688,7 @@ Transcrição literal arquivada:
               </div>
 
               {/* 3. Temas Abordados */}
-              <div style={{ marginBottom: '20px' }}>
+              <div data-pdf-block="true" style={{ marginBottom: '20px' }}>
                 <div style={{ marginBottom: '6px' }}>
                   <span
                     style={{
@@ -716,7 +716,7 @@ Transcrição literal arquivada:
               </div>
 
               {/* 4. Intervenções Técnicas */}
-              <div style={{ marginBottom: '20px' }}>
+              <div data-pdf-block="true" style={{ marginBottom: '20px' }}>
                 <div style={{ marginBottom: '6px' }}>
                   <span
                     style={{
@@ -754,7 +754,7 @@ Transcrição literal arquivada:
               </div>
 
               {/* 5. Insights e Resposta do Paciente */}
-              <div style={{ marginBottom: '20px' }}>
+              <div data-pdf-block="true" style={{ marginBottom: '20px' }}>
                 <div style={{ marginBottom: '6px' }}>
                   <span
                     style={{
@@ -777,7 +777,7 @@ Transcrição literal arquivada:
               </div>
 
               {/* 6. Tarefas e Acordos */}
-              <div style={{ marginBottom: '20px' }}>
+              <div data-pdf-block="true" style={{ marginBottom: '20px' }}>
                 <div style={{ marginBottom: '6px' }}>
                   <span
                     style={{
@@ -805,7 +805,7 @@ Transcrição literal arquivada:
               </div>
 
               {/* 7. Planejamento Próxima Sessão */}
-              <div style={{ marginBottom: '20px' }}>
+              <div data-pdf-block="true" style={{ marginBottom: '20px' }}>
                 <div style={{ marginBottom: '6px' }}>
                   <span
                     style={{
@@ -830,6 +830,7 @@ Transcrição literal arquivada:
               {/* 8. Observações Sigilosas */}
               {session.structuredNote.observacoesSigilosas && (
                 <div
+                  data-pdf-block="true"
                   style={{
                     backgroundColor: '#f8fafc',
                     border: '1px solid #e2e8f0',
@@ -850,7 +851,7 @@ Transcrição literal arquivada:
 
               {/* 9. Transcrição Literal Polida */}
               {showRawTranscription && session.rawTranscription && (
-                <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '16px', marginTop: '24px' }}>
+                <div data-pdf-block="true" style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '16px', marginTop: '24px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <span style={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b' }}>
                       Registro Fiel do Áudio da Sessão (Transcrição Literal)
@@ -880,7 +881,7 @@ Transcrição literal arquivada:
             </div>
 
             {/* CARIMBO PROFISSIONAL & ASSINATURA */}
-            <div style={{ marginTop: '48px', paddingTop: '24px', borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
+            <div data-pdf-block="true" style={{ marginTop: '48px', paddingTop: '24px', borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
               <div style={{ maxWidth: '320px', margin: '0 auto' }}>
                 <div style={{ height: '1px', backgroundColor: '#94a3b8', width: '220px', margin: '0 auto 10px auto' }} />
                 <div
