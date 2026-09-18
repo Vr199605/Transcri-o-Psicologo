@@ -161,80 +161,135 @@ const normalizeModel = (name?: string): string => {
   return name;
 };
 
+const FALLBACK_CANDIDATES = [
+  'gemini-3.6-flash',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro',
+];
+
+const isHighDemandOrOverloadError = (message: string, status?: number): boolean => {
+  const msg = (message || '').toLowerCase();
+  return (
+    status === 503 ||
+    status === 429 ||
+    status === 500 ||
+    msg.includes('high demand') ||
+    msg.includes('overloaded') ||
+    msg.includes('temporarily unavailable') ||
+    msg.includes('spikes in demand') ||
+    msg.includes('resource exhausted')
+  );
+};
+
 export const processAudioWithGemini = async (
   audioBlob: Blob,
   apiKey: string,
-  modelName: string = 'gemini-3.6-flash'
+  modelName: string = 'gemini-3.6-flash',
+  onStatusUpdate?: (statusMessage: string) => void
 ): Promise<AIProcessingResult> => {
   if (!apiKey || apiKey.trim() === '') {
     throw new Error('Chave de API do Gemini não configurada.');
   }
 
-  const activeModel = normalizeModel(modelName);
+  const primaryModel = normalizeModel(modelName);
+  // Lista de modelos ordenados: o preferido primeiro, seguido dos reservas
+  const modelsToTry = [
+    primaryModel,
+    ...FALLBACK_CANDIDATES.filter((m) => m !== primaryModel),
+  ];
+
   const base64Audio = await blobToBase64(audioBlob);
   const mimeType = audioBlob.type || 'audio/webm';
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
+  let lastError: Error = new Error('Falha ao processar áudio.');
 
-  const requestBody = {
-    contents: [
-      {
-        parts: [
-          {
-            inlineData: {
-              mimeType: mimeType.includes('audio') ? mimeType : 'audio/webm',
-              data: base64Audio,
+  for (let i = 0; i < modelsToTry.length; i++) {
+    const currentModel = modelsToTry[i];
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey.trim()}`;
+
+    const requestBody = {
+      contents: [
+        {
+          parts: [
+            {
+              inlineData: {
+                mimeType: mimeType.includes('audio') ? mimeType : 'audio/webm',
+                data: base64Audio,
+              },
             },
-          },
-          {
-            text: 'Por favor, processe este áudio clínico de encerramento de sessão conforme suas instruções de sistema e retorne o JSON com a transcrição impecável e a evolução clínica estruturada.',
-          },
-        ],
+            {
+              text: 'Por favor, processe este áudio clínico de encerramento de sessão conforme suas instruções de sistema e retorne o JSON com a transcrição impecável e a evolução clínica estruturada.',
+            },
+          ],
+        },
+      ],
+      systemInstruction: {
+        parts: [{ text: SYSTEM_PROMPT }],
       },
-    ],
-    systemInstruction: {
-      parts: [{ text: SYSTEM_PROMPT }],
-    },
-    generationConfig: {
-      temperature: 0.2,
-      responseMimeType: 'application/json',
-    },
-  };
+      generationConfig: {
+        temperature: 0.2,
+        responseMimeType: 'application/json',
+      },
+    };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody),
-  });
+    try {
+      if (i > 0 && onStatusUpdate) {
+        onStatusUpdate(`Modelo ${modelsToTry[i - 1]} em alta demanda. Alternando para ${currentModel}...`);
+      }
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    const message =
-      errorData?.error?.message || `Falha na requisição: status ${response.status} (${response.statusText})`;
-    throw new Error(message);
-  }
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-  const data = await response.json();
-  const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const message =
+          errorData?.error?.message || `Falha na requisição: status ${response.status} (${response.statusText})`;
 
-  if (!textOutput) {
-    throw new Error('Nenhuma resposta foi gerada pelo modelo de IA.');
-  }
+        if (isHighDemandOrOverloadError(message, response.status) && i < modelsToTry.length - 1) {
+          console.warn(`Modelo ${currentModel} com alta demanda temporária. Tentando próximo modelo...`);
+          await new Promise((r) => setTimeout(r, 1200)); // Pequena pausa para desafogar requisições
+          continue;
+        }
 
-  try {
-    const parsed = JSON.parse(textOutput) as AIProcessingResult;
-    return parsed;
-  } catch (e) {
-    console.error('Erro ao fazer parse do JSON retornado pelo Gemini:', textOutput, e);
-    // Tenta extrair JSON com regex caso venha com markdown wrappers
-    const match = textOutput.match(/\{[\s\S]*\}/);
-    if (match) {
-      return JSON.parse(match[0]) as AIProcessingResult;
+        throw new Error(message);
+      }
+
+      const data = await response.json();
+      const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!textOutput) {
+        throw new Error('Nenhuma resposta foi gerada pelo modelo de IA.');
+      }
+
+      try {
+        const parsed = JSON.parse(textOutput) as AIProcessingResult;
+        return parsed;
+      } catch {
+        const match = textOutput.match(/\{[\s\S]*\}/);
+        if (match) {
+          return JSON.parse(match[0]) as AIProcessingResult;
+        }
+        throw new Error('O modelo retornou uma resposta fora do padrão JSON esperado.');
+      }
+    } catch (err) {
+      lastError = err as Error;
+      const errMsg = (err as Error).message || '';
+      if (isHighDemandOrOverloadError(errMsg) && i < modelsToTry.length - 1) {
+        console.warn(`Erro no modelo ${currentModel}: ${errMsg}. Alternando para modelo reserva...`);
+        await new Promise((r) => setTimeout(r, 1000));
+        continue;
+      }
+      throw err;
     }
-    throw new Error('O modelo retornou uma resposta fora do padrão JSON esperado.');
   }
+
+  throw lastError;
 };
 
 // Processa texto transcrito diretamente (caso o psicólogo queira colar ou usar speech recognition)
