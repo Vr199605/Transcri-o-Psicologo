@@ -1,4 +1,4 @@
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 import { jsPDF } from 'jspdf';
 
 export const generatePdfBlob = async (
@@ -12,7 +12,7 @@ export const generatePdfBlob = async (
 
   if (onProgress) onProgress('Renderizando tipografia e layout clínico (300 DPI)...');
 
-  // Ajuste de escala para mobile: 2x para rapidez e memória estável em celulares
+  // Ajuste de escala para mobile: 2x para rapidez e estabilidade de memória
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   const scale = isMobile ? 2.0 : 2.5;
 
@@ -71,30 +71,31 @@ export const exportElementToPdf = async (
   try {
     const { pdf, blob } = await generatePdfBlob(element, onProgress);
 
-    if (onProgress) onProgress('Concluindo download...');
+    if (onProgress) onProgress('Concluindo download do arquivo...');
 
-    // No celular, downloads diretos podem ser bloqueados por popups.
-    // Usamos um elemento <a> com blob URL e clique programático, garantindo que não haja bloqueio no Safari/Chrome Mobile.
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (isIOS) {
+    // Download direto via Blob URL universal (funciona no Chrome, Safari, Edge, Firefox e Celulares)
+    try {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
-      a.target = '_blank';
+      a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
       setTimeout(() => {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-      }, 2000);
-    } else {
+      }, 4000);
+    } catch {
+      // Fallback para pdf.save nativo caso blob url falhe
       pdf.save(fileName);
     }
   } catch (error) {
-    console.error('Erro ao gerar PDF:', error);
+    console.error('Erro ao gerar PDF via canvas:', error);
+    // Fallback de contingência: aciona a tela de impressão do navegador para Salvar como PDF
+    printDocumentDirectly();
     throw new Error(
-      'Não foi possível gerar o arquivo PDF. Tente a opção de Imprimir ou Compartilhar.'
+      'Não foi possível baixar automaticamente. Abrindo a tela de impressão do seu navegador para Salvar como PDF em alta definição.'
     );
   }
 };
@@ -122,7 +123,6 @@ export const sharePdfIfAvailable = async (
       return true;
     }
   } catch (err) {
-    // Usuário cancelou o compartilhamento ou erro
     if ((err as Error).name !== 'AbortError') {
       console.warn('Falha no Web Share:', err);
     }
