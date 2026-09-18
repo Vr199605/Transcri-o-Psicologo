@@ -6,11 +6,6 @@ import {
   Check,
   Edit3,
   FileText,
-  ShieldCheck,
-  Calendar,
-  Clock,
-  User,
-  Activity,
   Palette,
   Eye,
   EyeOff,
@@ -32,50 +27,44 @@ const THEME_STYLES: Record<
     primary: string;
     primaryLight: string;
     border: string;
-    badge: string;
     accent: string;
-    headerBg: string;
+    textHeader: string;
   }
 > = {
   emerald: {
     primary: '#065f46',
-    primaryLight: '#ecfdf5',
-    border: '#a7f3d0',
-    badge: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    primaryLight: '#f0fdf4',
+    border: '#bbf7d0',
     accent: '#059669',
-    headerBg: 'from-emerald-950 via-emerald-900 to-teal-950',
+    textHeader: '#064e3b',
   },
   slate: {
     primary: '#1e293b',
     primaryLight: '#f8fafc',
     border: '#cbd5e1',
-    badge: 'bg-slate-100 text-slate-800 border-slate-200',
-    accent: '#475569',
-    headerBg: 'from-slate-950 via-slate-900 to-zinc-900',
+    accent: '#334155',
+    textHeader: '#0f172a',
   },
   burgundy: {
     primary: '#701a31',
     primaryLight: '#fff1f2',
     border: '#fecdd3',
-    badge: 'bg-rose-50 text-rose-900 border-rose-200',
     accent: '#9f1239',
-    headerBg: 'from-rose-950 via-zinc-900 to-rose-950',
+    textHeader: '#4c0519',
   },
   navy: {
     primary: '#1e3a8a',
     primaryLight: '#eff6ff',
     border: '#bfdbfe',
-    badge: 'bg-blue-50 text-blue-900 border-blue-200',
     accent: '#2563eb',
-    headerBg: 'from-blue-950 via-slate-900 to-indigo-950',
+    textHeader: '#172554',
   },
   amber: {
     primary: '#78350f',
     primaryLight: '#fffbeb',
     border: '#fde68a',
-    badge: 'bg-amber-50 text-amber-900 border-amber-200',
     accent: '#d97706',
-    headerBg: 'from-amber-950 via-stone-900 to-amber-950',
+    textHeader: '#451a03',
   },
 };
 
@@ -91,14 +80,12 @@ export const ClinicalReportPreview: React.FC<ClinicalReportPreviewProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [showRawTranscription, setShowRawTranscription] = useState(true);
 
-  // Estados locais para edição
   const [editedNote, setEditedNote] = useState(session.structuredNote);
   const [editedRaw, setEditedRaw] = useState(session.rawTranscription);
 
   const reportRef = useRef<HTMLDivElement>(null);
   const currentTheme = THEME_STYLES[selectedTheme];
 
-  // Data formatada elegante (ex: 17 de Setembro de 2026)
   const formatDateFormal = (dateStr: string) => {
     try {
       const [year, month, day] = dateStr.split('-');
@@ -124,9 +111,8 @@ export const ClinicalReportPreview: React.FC<ClinicalReportPreviewProps> = ({
         setExportStatus(status);
       });
 
-      // Dispara confetes comemorativos pela geração perfeita
       confetti({
-        particleCount: 80,
+        particleCount: 70,
         spread: 70,
         origin: { y: 0.6 },
         colors: ['#10b981', '#059669', '#34d399', '#f59e0b'],
@@ -158,7 +144,6 @@ export const ClinicalReportPreview: React.FC<ClinicalReportPreviewProps> = ({
           colors: ['#10b981', '#34d399'],
         });
       } else {
-        // Se o navegador móvel não tiver suporte à janela de compartilhamento, faz o download direto
         await handleDownloadPdf();
       }
     } catch (e) {
@@ -221,59 +206,59 @@ Transcrição literal arquivada:
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Barra de Ações Superior / Toolbar */}
+      {/* BARRA DE AÇÕES SUPERIOR / TOOLBAR */}
       <div className="no-print bg-white p-4 rounded-2xl shadow-xs border border-stone-200 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-emerald-50 text-emerald-700 rounded-xl">
             <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-semibold text-stone-800 text-sm md:text-base">
-              Prontuário & Relatório de Sessão
+            <h3 className="font-semibold text-stone-800 text-sm sm:text-base">
+              Prontuário & Relatório Editorial
             </h3>
             <p className="text-xs text-stone-500">
-              Layout diagramado no padrão editorial A4 com conformidade ética do CFP
+              Padrão A4 oficial em conformidade com as diretrizes do CFP
             </p>
           </div>
         </div>
 
-        {/* Seleção de Paleta do Documento e Ações */}
+        {/* Paletas de cores e botões de ação */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Seletor de Tema / Cor do Cabeçalho */}
+          {/* Seletor de Tema */}
           <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-stone-50 rounded-xl border border-stone-200">
             <Palette className="w-3.5 h-3.5 text-stone-400" />
-            <span className="text-xs text-stone-500 mr-1 hidden sm:inline">Estilo:</span>
+            <span className="text-xs text-stone-500 mr-1 hidden sm:inline">Cor:</span>
             <button
               onClick={() => setSelectedTheme('emerald')}
-              className={`w-5 h-5 rounded-full bg-emerald-700 transition ${
+              className={`w-5 h-5 rounded-full bg-emerald-700 transition cursor-pointer ${
                 selectedTheme === 'emerald' ? 'ring-2 ring-emerald-500 ring-offset-1' : 'opacity-60'
               }`}
-              title="Esmeralda Terapêutico"
+              title="Esmeralda Clínico"
             />
             <button
               onClick={() => setSelectedTheme('slate')}
-              className={`w-5 h-5 rounded-full bg-slate-800 transition ${
+              className={`w-5 h-5 rounded-full bg-slate-800 transition cursor-pointer ${
                 selectedTheme === 'slate' ? 'ring-2 ring-slate-500 ring-offset-1' : 'opacity-60'
               }`}
               title="Ardósia Minimalista"
             />
             <button
               onClick={() => setSelectedTheme('burgundy')}
-              className={`w-5 h-5 rounded-full bg-rose-900 transition ${
+              className={`w-5 h-5 rounded-full bg-rose-900 transition cursor-pointer ${
                 selectedTheme === 'burgundy' ? 'ring-2 ring-rose-500 ring-offset-1' : 'opacity-60'
               }`}
               title="Borgonha Clássico"
             />
             <button
               onClick={() => setSelectedTheme('navy')}
-              className={`w-5 h-5 rounded-full bg-blue-900 transition ${
+              className={`w-5 h-5 rounded-full bg-blue-900 transition cursor-pointer ${
                 selectedTheme === 'navy' ? 'ring-2 ring-blue-500 ring-offset-1' : 'opacity-60'
               }`}
               title="Azul Sereno"
             />
             <button
               onClick={() => setSelectedTheme('amber')}
-              className={`w-5 h-5 rounded-full bg-amber-800 transition ${
+              className={`w-5 h-5 rounded-full bg-amber-800 transition cursor-pointer ${
                 selectedTheme === 'amber' ? 'ring-2 ring-amber-500 ring-offset-1' : 'opacity-60'
               }`}
               title="Ouro Nobre"
@@ -283,7 +268,6 @@ Transcrição literal arquivada:
           <button
             onClick={() => setShowRawTranscription(!showRawTranscription)}
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer"
-            title={showRawTranscription ? 'Ocultar transcrição literal no PDF' : 'Incluir transcrição literal no PDF'}
           >
             {showRawTranscription ? (
               <>
@@ -300,15 +284,15 @@ Transcrição literal arquivada:
 
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5 text-stone-500" />
-            <span>{isEditing ? 'Cancelar Edição' : 'Editar Conteúdo'}</span>
+            <span>{isEditing ? 'Cancelar' : 'Editar'}</span>
           </button>
 
           <button
             onClick={handleCopyText}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer"
           >
             {isCopied ? (
               <>
@@ -318,25 +302,25 @@ Transcrição literal arquivada:
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5 text-stone-500" />
-                <span>Copiar Texto</span>
+                <span className="hidden md:inline">Copiar</span>
               </>
             )}
           </button>
 
           <button
             onClick={printDocumentDirectly}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer"
-            title="Imprimir direto ou salvar via navegador"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer"
+            title="Imprimir direto ou Salvar como PDF nativo"
           >
             <Printer className="w-3.5 h-3.5 text-stone-500" />
-            <span className="hidden md:inline">Imprimir</span>
+            <span>Imprimir</span>
           </button>
 
           <button
             onClick={handleSharePdf}
             disabled={isExporting}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition cursor-pointer disabled:opacity-50"
-            title="Compartilhar PDF diretamente no WhatsApp ou salvar em Arquivos"
+            title="Compartilhar PDF no WhatsApp ou Arquivos"
           >
             <Share2 className="w-3.5 h-3.5 text-emerald-600" />
             <span>Compartilhar</span>
@@ -362,24 +346,24 @@ Transcrição literal arquivada:
         </div>
       </div>
 
-      {/* Editor rápido caso o psicólogo queira fazer ajustes finos antes de baixar */}
+      {/* Editor rápido antes de baixar */}
       {isEditing && (
         <div className="no-print bg-amber-50/70 border border-amber-200/80 rounded-2xl p-5 mb-2">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-semibold text-amber-900 flex items-center gap-2">
               <Edit3 className="w-4 h-4 text-amber-600" />
-              Edição Rápida da Evolução Clínica
+              Edição da Evolução Clínica
             </h4>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsEditing(false)}
-                className="px-3 py-1.5 text-xs text-stone-600 hover:bg-stone-200 rounded-lg"
+                className="px-3 py-1.5 text-xs text-stone-600 hover:bg-stone-200 rounded-lg cursor-pointer"
               >
                 Descartar
               </button>
               <button
                 onClick={handleSaveChanges}
-                className="px-4 py-1.5 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                className="px-4 py-1.5 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 cursor-pointer"
               >
                 Salvar Alterações
               </button>
@@ -450,314 +434,489 @@ Transcrição literal arquivada:
         </div>
       )}
 
-      {/* DOCUMENTO A4 CLÍNICO DE ALTA PERFEIÇÃO ("LAYOUT LINDO E PERFEITO") */}
-      <div className="flex justify-center overflow-x-auto pb-12 px-1 sm:px-0">
+      {/* CONTAINER DO DOCUMENTO A4 CLÍNICO EDITORIAL */}
+      <div className="flex justify-center overflow-x-auto pb-12 px-0">
         <div
           ref={reportRef}
-          className="a4-document bg-white rounded-xl shadow-xl p-5 sm:p-10 md:p-16 border border-stone-200/90 print:border-none print:shadow-none font-sans text-stone-800 relative"
-          style={{ minHeight: '297mm', width: '100%', maxWidth: '210mm' }}
+          className="a4-document bg-white shadow-2xl border border-stone-200/90 print:border-none print:shadow-none font-sans text-stone-800 relative"
+          style={{
+            width: '794px',
+            minWidth: '794px',
+            maxWidth: '794px',
+            minHeight: '1123px',
+            padding: '44px 48px',
+            boxSizing: 'border-box',
+            backgroundColor: '#ffffff',
+            color: '#1e293b',
+          }}
         >
-          {/* Marca d'água sutil de fundo do símbolo Ψ (Psi) */}
+          {/* Marca d'água sutil com símbolo grego da Psicologia (Ψ) */}
           <div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.025] z-0"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none',
+              userSelect: 'none',
+              opacity: 0.022,
+              fontSize: '360px',
+              fontFamily: 'Cormorant Garamond, Georgia, serif',
+              color: currentTheme.primary,
+              zIndex: 0,
+            }}
             aria-hidden="true"
           >
-            <span className="font-serif-clinical text-[320px] font-light">Ψ</span>
+            Ψ
           </div>
 
-          <div className="relative z-10">
-            {/* CABEÇALHO CLÍNICO EXECUTIVO */}
-            <header className="border-b-2 pb-6" style={{ borderColor: currentTheme.primary }}>
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                {/* Dados da Psicóloga */}
-                <div>
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-serif-clinical font-bold text-2xl shadow-sm"
-                      style={{ backgroundColor: currentTheme.primary }}
-                    >
-                      Ψ
+          <div style={{ position: 'relative', zIndex: 10 }}>
+            {/* CABEÇALHO CLÍNICO EXECUTIVO (TABELA INQUEBRÁVEL) */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', borderBottom: `2px solid ${currentTheme.primary}`, paddingBottom: '20px', marginBottom: '20px' }}>
+              <tbody>
+                <tr>
+                  {/* Lado Esquerdo: Identidade do Profissional */}
+                  <td style={{ verticalAlign: 'top', width: '62%', paddingBottom: '16px' }}>
+                    <table style={{ borderCollapse: 'collapse' }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ verticalAlign: 'middle', paddingRight: '14px', width: '52px' }}>
+                            <div
+                              style={{
+                                width: '48px',
+                                height: '48px',
+                                backgroundColor: currentTheme.primary,
+                                color: '#ffffff',
+                                borderRadius: '12px',
+                                textAlign: 'center',
+                                lineHeight: '48px',
+                                fontSize: '26px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Cormorant Garamond, Georgia, serif',
+                              }}
+                            >
+                              Ψ
+                            </div>
+                          </td>
+                          <td style={{ verticalAlign: 'middle' }}>
+                            <div
+                              style={{
+                                fontSize: '24px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Cormorant Garamond, Georgia, serif',
+                                color: currentTheme.textHeader,
+                                lineHeight: '1.15',
+                              }}
+                            >
+                              {profile.name}
+                            </div>
+                            <div style={{ marginTop: '4px', fontSize: '11px', color: '#475569' }}>
+                              <span
+                                style={{
+                                  backgroundColor: '#f1f5f9',
+                                  color: '#0f172a',
+                                  fontWeight: 'bold',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  marginRight: '8px',
+                                  letterSpacing: '0.5px',
+                                }}
+                              >
+                                {profile.crp}
+                              </span>
+                              <span style={{ fontWeight: '500' }}>
+                                {profile.approach}
+                              </span>
+                            </div>
+                            <div style={{ marginTop: '3px', fontSize: '10px', color: '#64748b', fontStyle: 'italic' }}>
+                              {profile.title}
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+
+                  {/* Lado Direito: Clínica, Contatos e Selo CFP */}
+                  <td style={{ verticalAlign: 'top', width: '38%', textAlign: 'right', paddingBottom: '16px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a', marginBottom: '3px' }}>
+                      {profile.clinicName}
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#64748b', marginBottom: '2px' }}>
+                      {profile.address}
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#64748b', marginBottom: '6px' }}>
+                      {profile.phone} &bull; {profile.email}
                     </div>
                     <div>
-                      <h1
-                        className="font-display-clinical text-2xl sm:text-3xl font-bold tracking-tight"
-                        style={{ color: currentTheme.primary }}
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          fontSize: '9px',
+                          fontWeight: 'bold',
+                          color: currentTheme.primary,
+                          backgroundColor: currentTheme.primaryLight,
+                          border: `1px solid ${currentTheme.border}`,
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                        }}
                       >
-                        {profile.name}
-                      </h1>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs font-semibold tracking-wider text-stone-700 uppercase bg-stone-100 px-2 py-0.5 rounded">
-                          {profile.crp}
-                        </span>
-                        <span className="text-xs text-stone-500 font-medium">
-                          {profile.approach}
-                        </span>
-                      </div>
+                        Prontuário Sigiloso &bull; CFP
+                      </span>
                     </div>
-                  </div>
-                  <p className="text-xs text-stone-500 mt-2 italic">
-                    {profile.title}
-                  </p>
-                </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-                {/* Dados da Clínica / Contato */}
-                <div className="sm:text-right text-xs text-stone-500 space-y-0.5">
-                  <p className="font-semibold text-stone-700 text-sm">{profile.clinicName}</p>
-                  <p>{profile.address}</p>
-                  <p>{profile.phone} • {profile.email}</p>
-                  <div className="pt-1">
-                    <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                      Prontuário Sigiloso • CFP
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </header>
-
-            {/* FAIXA DE IDENTIFICAÇÃO DA SESSÃO */}
-            <section
-              className="mt-6 p-4 rounded-xl border flex flex-wrap items-center justify-between gap-4"
+            {/* FAIXA DE IDENTIFICAÇÃO DA SESSÃO (TABELA INQUEBRÁVEL) */}
+            <div
               style={{
                 backgroundColor: currentTheme.primaryLight,
-                borderColor: currentTheme.border,
+                border: `1px solid ${currentTheme.border}`,
+                borderRadius: '10px',
+                padding: '14px 18px',
+                marginBottom: '26px',
               }}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white"
-                  style={{ backgroundColor: currentTheme.primary }}
-                >
-                  <User className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500">
-                    Paciente
-                  </span>
-                  <h2 className="text-base sm:text-lg font-bold text-stone-900 leading-tight">
-                    {session.patientName}
-                  </h2>
-                </div>
-              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <tbody>
+                  <tr>
+                    {/* Paciente */}
+                    <td style={{ width: '38%', verticalAlign: 'middle', borderRight: '1px solid rgba(0,0,0,0.06)', paddingRight: '14px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.5px', marginBottom: '2px' }}>
+                        Paciente Atendido(a)
+                      </div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#0f172a', lineHeight: '1.2' }}>
+                        {session.patientName}
+                      </div>
+                    </td>
 
-              <div className="flex items-center gap-4 sm:gap-6 text-xs text-stone-700 flex-wrap">
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-stone-400" />
-                  <div>
-                    <span className="text-[9px] block text-stone-400 uppercase font-semibold">Data</span>
-                    <span className="font-semibold">{formatDateFormal(session.sessionDate)}</span>
-                  </div>
-                </div>
+                    {/* Data */}
+                    <td style={{ width: '22%', verticalAlign: 'middle', paddingLeft: '14px', borderRight: '1px solid rgba(0,0,0,0.06)', paddingRight: '10px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.5px', marginBottom: '2px' }}>
+                        Data da Sessão
+                      </div>
+                      <div style={{ fontSize: '12px', fontWeight: '600', color: '#1e293b' }}>
+                        {formatDateFormal(session.sessionDate)}
+                      </div>
+                    </td>
 
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-stone-400" />
-                  <div>
-                    <span className="text-[9px] block text-stone-400 uppercase font-semibold">Horário / Duração</span>
-                    <span className="font-semibold">{session.sessionTime || '14:00'} ({session.durationMinutes || 50} min)</span>
-                  </div>
-                </div>
+                    {/* Horário e Duração */}
+                    <td style={{ width: '20%', verticalAlign: 'middle', paddingLeft: '12px', borderRight: '1px solid rgba(0,0,0,0.06)', paddingRight: '10px' }}>
+                      <div style={{ fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.5px', marginBottom: '2px' }}>
+                        Horário / Duração
+                      </div>
+                      <div style={{ fontSize: '12px', fontWeight: '600', color: '#1e293b' }}>
+                        {session.sessionTime || '14:00'} ({session.durationMinutes || 50} min)
+                      </div>
+                    </td>
 
-                <div className="flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-stone-400" />
-                  <div>
-                    <span className="text-[9px] block text-stone-400 uppercase font-semibold">Modalidade</span>
-                    <span className="font-semibold capitalize">{session.sessionType}</span>
-                  </div>
-                </div>
-
-                <div className="bg-white px-3 py-1 rounded-lg border border-stone-200 text-center">
-                  <span className="text-[9px] block text-stone-400 uppercase font-bold">Atendimento</span>
-                  <span className="font-bold text-stone-900">Sessão #{session.sessionNumber}</span>
-                </div>
-              </div>
-            </section>
+                    {/* Sessão e Modalidade */}
+                    <td style={{ width: '20%', verticalAlign: 'middle', paddingLeft: '14px', textAlign: 'right' }}>
+                      <div
+                        style={{
+                          display: 'inline-block',
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #cbd5e1',
+                          borderRadius: '8px',
+                          padding: '4px 10px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <div style={{ fontSize: '8px', fontWeight: 'bold', textTransform: 'uppercase', color: '#64748b' }}>
+                          Atendimento
+                        </div>
+                        <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#0f172a' }}>
+                          Sessão #{session.sessionNumber} &bull; <span style={{ textTransform: 'capitalize' }}>{session.sessionType}</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             {/* CORPO CLÍNICO DO PRONTUÁRIO */}
-            <main className="mt-8 space-y-6 text-stone-800 leading-relaxed text-sm">
+            <div style={{ fontSize: '13px', lineHeight: '1.65', color: '#1e293b' }}>
               {/* 1. Demanda Principal */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '6px' }}>
                   <span
-                    className="w-1.5 h-4 rounded-full"
-                    style={{ backgroundColor: currentTheme.primary }}
+                    style={{
+                      display: 'inline-block',
+                      width: '4px',
+                      height: '13px',
+                      backgroundColor: currentTheme.primary,
+                      marginRight: '8px',
+                      verticalAlign: 'middle',
+                      borderRadius: '2px',
+                    }}
                   />
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-stone-700">
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#334155' }}>
                     1. Queixa Principal & Demanda do Encontro
-                  </h3>
+                  </span>
                 </div>
-                <p className="pl-3.5 text-stone-700 leading-normal font-serif-clinical text-[15px]">
+                <div style={{ paddingLeft: '14px', color: '#334155', fontFamily: 'Newsreader, Georgia, serif', fontSize: '14px' }}>
                   {session.structuredNote.demandaPrincipal}
-                </p>
+                </div>
               </div>
 
               {/* 2. Exame do Estado Mental e Humor */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '6px' }}>
                   <span
-                    className="w-1.5 h-4 rounded-full"
-                    style={{ backgroundColor: currentTheme.primary }}
+                    style={{
+                      display: 'inline-block',
+                      width: '4px',
+                      height: '13px',
+                      backgroundColor: currentTheme.primary,
+                      marginRight: '8px',
+                      verticalAlign: 'middle',
+                      borderRadius: '2px',
+                    }}
                   />
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-stone-700">
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#334155' }}>
                     2. Exame do Estado Mental & Expressão Emocional
-                  </h3>
+                  </span>
                 </div>
-                <p className="pl-3.5 text-stone-700 leading-normal font-serif-clinical text-[15px]">
+                <div style={{ paddingLeft: '14px', color: '#334155', fontFamily: 'Newsreader, Georgia, serif', fontSize: '14px' }}>
                   {session.structuredNote.estadoMentalHumor}
-                </p>
+                </div>
               </div>
 
               {/* 3. Temas Abordados */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '6px' }}>
                   <span
-                    className="w-1.5 h-4 rounded-full"
-                    style={{ backgroundColor: currentTheme.primary }}
+                    style={{
+                      display: 'inline-block',
+                      width: '4px',
+                      height: '13px',
+                      backgroundColor: currentTheme.primary,
+                      marginRight: '8px',
+                      verticalAlign: 'middle',
+                      borderRadius: '2px',
+                    }}
                   />
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-stone-700">
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#334155' }}>
                     3. Conteúdos & Temas Centrais Abordados
-                  </h3>
+                  </span>
                 </div>
-                <ul className="pl-3.5 space-y-1.5">
+                <div style={{ paddingLeft: '14px' }}>
                   {session.structuredNote.temasAbordados.map((tema, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-stone-700">
-                      <span className="text-stone-400 font-bold">•</span>
+                    <div key={idx} style={{ marginBottom: '4px', color: '#334155' }}>
+                      <span style={{ color: '#94a3b8', fontWeight: 'bold', marginRight: '6px' }}>&bull;</span>
                       <span>{tema}</span>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              {/* 4. Intervenções Realizadas */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+              {/* 4. Intervenções Técnicas */}
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '6px' }}>
                   <span
-                    className="w-1.5 h-4 rounded-full"
-                    style={{ backgroundColor: currentTheme.primary }}
+                    style={{
+                      display: 'inline-block',
+                      width: '4px',
+                      height: '13px',
+                      backgroundColor: currentTheme.primary,
+                      marginRight: '8px',
+                      verticalAlign: 'middle',
+                      borderRadius: '2px',
+                    }}
                   />
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-stone-700">
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#334155' }}>
                     4. Intervenções Técnicas & Conduta Psicoterápica
-                  </h3>
+                  </span>
                 </div>
-                <ul className="pl-3.5 space-y-1.5">
+                <div style={{ paddingLeft: '14px' }}>
                   {session.structuredNote.intervencoes.map((intervencao, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-stone-700">
+                    <div key={idx} style={{ marginBottom: '4px', color: '#334155' }}>
                       <span
-                        className="inline-block w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
-                        style={{ backgroundColor: currentTheme.accent }}
+                        style={{
+                          display: 'inline-block',
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          backgroundColor: currentTheme.accent,
+                          marginRight: '8px',
+                          verticalAlign: 'middle',
+                        }}
                       />
                       <span>{intervencao}</span>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              {/* 5. Insights e Reação do Paciente */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+              {/* 5. Insights e Resposta do Paciente */}
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '6px' }}>
                   <span
-                    className="w-1.5 h-4 rounded-full"
-                    style={{ backgroundColor: currentTheme.primary }}
+                    style={{
+                      display: 'inline-block',
+                      width: '4px',
+                      height: '13px',
+                      backgroundColor: currentTheme.primary,
+                      marginRight: '8px',
+                      verticalAlign: 'middle',
+                      borderRadius: '2px',
+                    }}
                   />
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-stone-700">
-                    5. Insights, Elaboração & Receptividade
-                  </h3>
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#334155' }}>
+                    5. Insights, Elaboração & Receptividade do(a) Paciente
+                  </span>
                 </div>
-                <p className="pl-3.5 text-stone-700 leading-normal font-serif-clinical text-[15px]">
+                <div style={{ paddingLeft: '14px', color: '#334155', fontFamily: 'Newsreader, Georgia, serif', fontSize: '14px' }}>
                   {session.structuredNote.insightsPaciente}
-                </p>
+                </div>
               </div>
 
-              {/* 6. Tarefas e Prescrições */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+              {/* 6. Tarefas e Acordos */}
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '6px' }}>
                   <span
-                    className="w-1.5 h-4 rounded-full"
-                    style={{ backgroundColor: currentTheme.primary }}
+                    style={{
+                      display: 'inline-block',
+                      width: '4px',
+                      height: '13px',
+                      backgroundColor: currentTheme.primary,
+                      marginRight: '8px',
+                      verticalAlign: 'middle',
+                      borderRadius: '2px',
+                    }}
                   />
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-stone-700">
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#334155' }}>
                     6. Acordos Inter-Sessão & Prescrições Comportamentais
-                  </h3>
+                  </span>
                 </div>
-                <ul className="pl-3.5 space-y-1.5">
+                <div style={{ paddingLeft: '14px' }}>
                   {session.structuredNote.tarefasAcordadas.map((tarefa, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-stone-700">
-                      <span className="text-emerald-600 font-bold">✓</span>
+                    <div key={idx} style={{ marginBottom: '4px', color: '#334155' }}>
+                      <span style={{ color: '#059669', fontWeight: 'bold', marginRight: '6px' }}>✓</span>
                       <span>{tarefa}</span>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
               {/* 7. Planejamento Próxima Sessão */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: '6px' }}>
                   <span
-                    className="w-1.5 h-4 rounded-full"
-                    style={{ backgroundColor: currentTheme.primary }}
+                    style={{
+                      display: 'inline-block',
+                      width: '4px',
+                      height: '13px',
+                      backgroundColor: currentTheme.primary,
+                      marginRight: '8px',
+                      verticalAlign: 'middle',
+                      borderRadius: '2px',
+                    }}
                   />
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-stone-700">
+                  <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#334155' }}>
                     7. Planejamento & Direcionamento da Próxima Sessão
-                  </h3>
+                  </span>
                 </div>
-                <p className="pl-3.5 text-stone-700 leading-normal font-serif-clinical text-[15px]">
+                <div style={{ paddingLeft: '14px', color: '#334155', fontFamily: 'Newsreader, Georgia, serif', fontSize: '14px' }}>
                   {session.structuredNote.planejamentoProximaSessao}
-                </p>
+                </div>
               </div>
 
-              {/* 8. Observações Sigilosas (se houver) */}
+              {/* 8. Observações Sigilosas */}
               {session.structuredNote.observacoesSigilosas && (
-                <div className="p-3.5 bg-stone-50 rounded-xl border border-stone-200 text-xs">
-                  <div className="flex items-center gap-1.5 text-stone-600 font-semibold mb-1 uppercase tracking-wider text-[11px]">
-                    <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                <div
+                  style={{
+                    backgroundColor: '#f8fafc',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    marginBottom: '20px',
+                    fontSize: '11px',
+                  }}
+                >
+                  <div style={{ fontWeight: 'bold', color: '#475569', marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Anotações Restritas de Acompanhamento Clínico
                   </div>
-                  <p className="text-stone-600 italic">
+                  <div style={{ fontStyle: 'italic', color: '#64748b' }}>
                     {session.structuredNote.observacoesSigilosas}
-                  </p>
+                  </div>
                 </div>
               )}
 
-              {/* 9. Transcrição Literal Integral da Fala (Opcional no Documento) */}
+              {/* 9. Transcrição Literal Polida */}
               {showRawTranscription && session.rawTranscription && (
-                <div className="pt-4 border-t border-dashed border-stone-200 mt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-bold text-xs uppercase tracking-wider text-stone-500">
+                <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '16px', marginTop: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b' }}>
                       Registro Fiel do Áudio da Sessão (Transcrição Literal)
-                    </h4>
-                    <span className="text-[10px] text-stone-400">Processado via IA Multimodal</span>
+                    </span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8' }}>
+                      Processado via IA Multimodal
+                    </span>
                   </div>
-                  <blockquote className="pl-3 border-l-2 border-stone-300 text-xs text-stone-600 italic leading-relaxed bg-stone-50/50 p-2.5 rounded-r-lg">
+                  <blockquote
+                    style={{
+                      borderLeft: `2px solid ${currentTheme.primary}`,
+                      paddingLeft: '12px',
+                      margin: 0,
+                      fontSize: '11px',
+                      fontStyle: 'italic',
+                      color: '#475569',
+                      lineHeight: '1.6',
+                      backgroundColor: '#f8fafc',
+                      padding: '10px 14px',
+                      borderRadius: '0 8px 8px 0',
+                    }}
+                  >
                     "{session.rawTranscription}"
                   </blockquote>
                 </div>
               )}
-            </main>
+            </div>
 
-            {/* ASSINATURA & CARIMBO PROFISSIONAL */}
-            <footer className="mt-14 pt-8 border-t border-stone-200 text-center">
-              <div className="max-w-xs mx-auto space-y-1">
-                <div className="h-0.5 bg-stone-300 w-48 mx-auto mb-3" />
-                <p
-                  className="font-bold text-stone-900 text-sm font-display-clinical"
-                  style={{ color: currentTheme.primary }}
+            {/* CARIMBO PROFISSIONAL & ASSINATURA */}
+            <div style={{ marginTop: '48px', paddingTop: '24px', borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
+              <div style={{ maxWidth: '320px', margin: '0 auto' }}>
+                <div style={{ height: '1px', backgroundColor: '#94a3b8', width: '220px', margin: '0 auto 10px auto' }} />
+                <div
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    fontFamily: 'Cormorant Garamond, Georgia, serif',
+                    color: currentTheme.textHeader,
+                  }}
                 >
                   {profile.name}
-                </p>
-                <p className="text-xs text-stone-600 font-medium tracking-wide">
+                </div>
+                <div style={{ fontSize: '11px', color: '#475569', fontWeight: '500', marginTop: '2px' }}>
                   {profile.crp}
-                </p>
-                <p className="text-[11px] text-stone-400">
+                </div>
+                <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '1px' }}>
                   {profile.clinicName}
-                </p>
+                </div>
               </div>
 
               {/* AVISO LEGAL CFP */}
-              <div className="mt-8 pt-4 border-t border-stone-100 text-[9px] text-stone-400 uppercase tracking-wider leading-relaxed">
-                Documento emitido para fins de registro e prontuário psicológico individual, em
-                estrita observância ao Código de Ética Profissional do Psicólogo (Resolução CFP nº
-                010/2005) e Resolução CFP nº 01/2009. Sigilo profissional resguardado por lei.
+              <div
+                style={{
+                  marginTop: '32px',
+                  paddingTop: '14px',
+                  borderTop: '1px solid #f1f5f9',
+                  fontSize: '8.5px',
+                  color: '#94a3b8',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  lineHeight: '1.5',
+                }}
+              >
+                Documento emitido para fins de registro e prontuário psicológico individual, em estrita observância ao Código de Ética Profissional do Psicólogo (Resolução CFP nº 010/2005) e Resolução CFP nº 01/2009. Sigilo profissional resguardado por lei.
               </div>
-            </footer>
+            </div>
           </div>
         </div>
       </div>
