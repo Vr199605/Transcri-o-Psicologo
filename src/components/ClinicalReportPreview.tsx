@@ -13,11 +13,12 @@ import {
   Activity,
   Palette,
   Eye,
-  EyeOff
+  EyeOff,
+  Share2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { PsychologistProfile, SessionRecord, ThemeColor } from '../types';
-import { exportElementToPdf, printDocumentDirectly } from '../services/pdfService';
+import { exportElementToPdf, sharePdfIfAvailable, printDocumentDirectly } from '../services/pdfService';
 
 interface ClinicalReportPreviewProps {
   session: SessionRecord;
@@ -130,6 +131,36 @@ export const ClinicalReportPreview: React.FC<ClinicalReportPreviewProps> = ({
         origin: { y: 0.6 },
         colors: ['#10b981', '#059669', '#34d399', '#f59e0b'],
       });
+    } catch (e) {
+      alert((e as Error).message);
+    } finally {
+      setIsExporting(false);
+      setExportStatus('');
+    }
+  };
+
+  const handleSharePdf = async () => {
+    if (!reportRef.current) return;
+    try {
+      setIsExporting(true);
+      const safePatient = session.patientName.replace(/\s+/g, '_').toLowerCase();
+      const filename = `prontuario_${safePatient}_sessao_${session.sessionNumber}.pdf`;
+
+      const shared = await sharePdfIfAvailable(reportRef.current, filename, (status) => {
+        setExportStatus(status);
+      });
+
+      if (shared) {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#34d399'],
+        });
+      } else {
+        // Se o navegador móvel não tiver suporte à janela de compartilhamento, faz o download direto
+        await handleDownloadPdf();
+      }
     } catch (e) {
       alert((e as Error).message);
     } finally {
@@ -302,6 +333,16 @@ Transcrição literal arquivada:
           </button>
 
           <button
+            onClick={handleSharePdf}
+            disabled={isExporting}
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition cursor-pointer disabled:opacity-50"
+            title="Compartilhar PDF diretamente no WhatsApp ou salvar em Arquivos"
+          >
+            <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Compartilhar</span>
+          </button>
+
+          <button
             onClick={handleDownloadPdf}
             disabled={isExporting}
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs md:text-sm font-semibold shadow-md shadow-emerald-600/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50"
@@ -314,7 +355,7 @@ Transcrição literal arquivada:
             ) : (
               <>
                 <Download className="w-4 h-4" />
-                <span>Baixar PDF Perfeito</span>
+                <span>Baixar PDF</span>
               </>
             )}
           </button>
@@ -410,10 +451,10 @@ Transcrição literal arquivada:
       )}
 
       {/* DOCUMENTO A4 CLÍNICO DE ALTA PERFEIÇÃO ("LAYOUT LINDO E PERFEITO") */}
-      <div className="flex justify-center overflow-x-auto pb-12">
+      <div className="flex justify-center overflow-x-auto pb-12 px-1 sm:px-0">
         <div
           ref={reportRef}
-          className="a4-document bg-white rounded-lg shadow-xl p-8 sm:p-12 md:p-16 border border-stone-200/90 print:border-none print:shadow-none font-sans text-stone-800 relative"
+          className="a4-document bg-white rounded-xl shadow-xl p-5 sm:p-10 md:p-16 border border-stone-200/90 print:border-none print:shadow-none font-sans text-stone-800 relative"
           style={{ minHeight: '297mm', width: '100%', maxWidth: '210mm' }}
         >
           {/* Marca d'água sutil de fundo do símbolo Ψ (Psi) */}
