@@ -137,7 +137,7 @@ export const App: React.FC = () => {
         result = await processAudioWithGemini(
           audioBlob,
           profile.geminiApiKey,
-          profile.selectedModel || 'gemini-2.5-flash'
+          profile.selectedModel || 'gemini-3.6-flash'
         );
       } else {
         // Sem chave API configurada: simulação assistida com transcrição clínica

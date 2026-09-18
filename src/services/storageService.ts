@@ -17,7 +17,7 @@ export const DEFAULT_PROFILE: PsychologistProfile = {
   address: 'Av. Paulista, 1800 - Conjunto 142, São Paulo - SP',
   signatureText: 'Dra. Carolina Mendes • CRP 06/158.420',
   geminiApiKey: (import.meta as unknown as { env?: { VITE_GEMINI_API_KEY?: string } }).env?.VITE_GEMINI_API_KEY || '',
-  selectedModel: 'gemini-2.5-flash',
+  selectedModel: 'gemini-3.6-flash',
   themeColor: 'emerald',
 };
 
@@ -54,9 +54,15 @@ export const getProfile = (): PsychologistProfile => {
     const raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
     if (!raw) return { ...DEFAULT_PROFILE, geminiApiKey: envKey };
     const parsed = JSON.parse(raw);
+    const selectedModel =
+      parsed.selectedModel === 'gemini-2.5-flash' || !parsed.selectedModel
+        ? 'gemini-3.6-flash'
+        : parsed.selectedModel;
+
     return {
       ...DEFAULT_PROFILE,
       ...parsed,
+      selectedModel,
       geminiApiKey: parsed.geminiApiKey || envKey,
     };
   } catch (e) {

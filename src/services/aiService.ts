@@ -156,19 +156,25 @@ Responda ESTRITAMENTE em formato JSON com a seguinte estrutura:
   }
 }`;
 
+const normalizeModel = (name?: string): string => {
+  if (!name || name === 'gemini-2.5-flash') return 'gemini-3.6-flash';
+  return name;
+};
+
 export const processAudioWithGemini = async (
   audioBlob: Blob,
   apiKey: string,
-  modelName: string = 'gemini-2.5-flash'
+  modelName: string = 'gemini-3.6-flash'
 ): Promise<AIProcessingResult> => {
   if (!apiKey || apiKey.trim() === '') {
     throw new Error('Chave de API do Gemini não configurada.');
   }
 
+  const activeModel = normalizeModel(modelName);
   const base64Audio = await blobToBase64(audioBlob);
   const mimeType = audioBlob.type || 'audio/webm';
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey.trim()}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
 
   const requestBody = {
     contents: [
@@ -235,13 +241,14 @@ export const processAudioWithGemini = async (
 export const structureTranscriptionWithGemini = async (
   transcriptionText: string,
   apiKey: string,
-  modelName: string = 'gemini-2.5-flash'
+  modelName: string = 'gemini-3.6-flash'
 ): Promise<AIProcessingResult> => {
   if (!apiKey || apiKey.trim() === '') {
     throw new Error('Chave de API do Gemini não configurada.');
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey.trim()}`;
+  const activeModel = normalizeModel(modelName);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
 
   const requestBody = {
     contents: [
