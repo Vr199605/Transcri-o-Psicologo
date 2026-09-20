@@ -252,23 +252,29 @@ Responda ESTRITAMENTE em formato JSON com esta estrutura:
 import { convertAudioBlobToWav } from './audioUtils';
 
 const FALLBACK_CANDIDATES = [
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
+  'gemini-flash-latest',
+  'gemini-3.5-flash',
+  'gemini-3.8-flash',
   'gemini-3.6-flash',
-  'gemini-2.5-flash',
-  'gemini-1.5-pro',
+  'gemini-pro-latest',
 ];
 
 const normalizeModel = (name?: string): string => {
-  if (!name) return 'gemini-2.0-flash';
-  if (name === 'gemini-2.5-flash') return 'gemini-2.0-flash';
+  if (
+    !name ||
+    name === 'gemini-2.5-flash' ||
+    name === 'gemini-2.0-flash' ||
+    name === 'gemini-1.5-flash'
+  ) {
+    return 'gemini-flash-latest';
+  }
   return name;
 };
 
 export const processAudioWithGemini = async (
   audioBlob: Blob,
   apiKey: string,
-  modelName: string = 'gemini-2.0-flash',
+  modelName: string = 'gemini-flash-latest',
   approach: TheoreticalApproach = 'tcc',
   onStatusUpdate?: (statusMessage: string) => void
 ): Promise<AIProcessingResult> => {
@@ -450,7 +456,7 @@ ${lastSession?.structuredNote.planejamentoProximaSessao || 'Revisar acordos e ch
 3. Alertas e pontos de atenção emocional
 4. Direcionamento e pauta sugerida para a sessão de hoje`;
 
-  const memoryModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-3.6-flash'];
+  const memoryModels = ['gemini-flash-latest', 'gemini-3.5-flash', 'gemini-3.8-flash'];
   for (const model of memoryModels) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`;

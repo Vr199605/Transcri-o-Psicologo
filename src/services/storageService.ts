@@ -7,6 +7,9 @@ const STORAGE_KEYS = {
   DARK_MODE: 'aurapsi_dark_mode_v1',
 };
 
+const DEFAULT_API_KEY =
+  (import.meta as unknown as { env?: { VITE_GEMINI_API_KEY?: string } }).env?.VITE_GEMINI_API_KEY || '';
+
 export const DEFAULT_PROFILE: PsychologistProfile = {
   name: 'Dra. Carolina Mendes',
   crp: 'CRP 06/158.420',
@@ -18,8 +21,8 @@ export const DEFAULT_PROFILE: PsychologistProfile = {
   phone: '(11) 98765-4321',
   address: 'Av. Paulista, 1800 - Conjunto 142, São Paulo - SP',
   signatureText: 'Dra. Carolina Mendes • CRP 06/158.420',
-  geminiApiKey: (import.meta as unknown as { env?: { VITE_GEMINI_API_KEY?: string } }).env?.VITE_GEMINI_API_KEY || '',
-  selectedModel: 'gemini-2.0-flash',
+  geminiApiKey: DEFAULT_API_KEY,
+  selectedModel: 'gemini-flash-latest',
   themeColor: 'emerald',
 };
 
@@ -175,20 +178,29 @@ export const DEFAULT_SESSIONS: SessionRecord[] = [
 
 export const getProfile = (): PsychologistProfile => {
   try {
-    const envKey = (import.meta as unknown as { env?: { VITE_GEMINI_API_KEY?: string } }).env?.VITE_GEMINI_API_KEY || '';
+    const envKey =
+      (import.meta as unknown as { env?: { VITE_GEMINI_API_KEY?: string } }).env?.VITE_GEMINI_API_KEY ||
+      DEFAULT_API_KEY;
     const raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
     if (!raw) return { ...DEFAULT_PROFILE, geminiApiKey: envKey };
     const parsed = JSON.parse(raw);
     const selectedModel =
-      parsed.selectedModel === 'gemini-2.5-flash' || !parsed.selectedModel
-        ? 'gemini-2.0-flash'
+      !parsed.selectedModel ||
+      parsed.selectedModel === 'gemini-2.5-flash' ||
+      parsed.selectedModel === 'gemini-2.0-flash'
+        ? 'gemini-flash-latest'
         : parsed.selectedModel;
+
+    const apiKey =
+      parsed.geminiApiKey && parsed.geminiApiKey.trim() !== ''
+        ? parsed.geminiApiKey
+        : envKey;
 
     return {
       ...DEFAULT_PROFILE,
       ...parsed,
       selectedModel,
-      geminiApiKey: parsed.geminiApiKey || envKey,
+      geminiApiKey: apiKey,
     };
   } catch (e) {
     console.error('Erro ao ler perfil do psicólogo:', e);
