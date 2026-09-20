@@ -92,9 +92,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, selectedModel: e.target.value })}
                 className="bg-white border border-emerald-300 rounded-lg px-2 py-1 font-sans text-xs"
               >
-                <option value="gemini-3.6-flash">Gemini 3.6 Flash (Recomendado - Mais recente)</option>
-                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Mais estável e rápido - Recomendado)</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Ultra confiável)</option>
+                <option value="gemini-3.6-flash">Gemini 3.6 Flash</option>
                 <option value="gemini-1.5-pro">Gemini 1.5 Pro (Máxima densidade clínica)</option>
               </select>
             </div>

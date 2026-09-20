@@ -164,52 +164,36 @@ export const App: React.FC = () => {
     showNotification(`Paciente ${created.name} cadastrado com sucesso!`, 'success');
   };
 
+  const [transcriptionError, setTranscriptionError] = useState<string | null>(null);
+
   const handleAudioReady = async (audioBlob: Blob, duration: number) => {
     const currentPatient = patients.find((p) => p.id === selectedPatientId);
     const patientName = currentPatient ? currentPatient.name : 'Paciente';
 
+    setTranscriptionError(null);
+
+    // Se não tiver chave de API configurada, avisa o usuário com clareza
+    if (!profile.geminiApiKey || profile.geminiApiKey.trim() === '') {
+      const msg =
+        'Áudio gravado! Para transcrever sua voz real em texto, insira sua chave gratuita da API Gemini nas Configurações. Você também pode testar os casos de exemplo acima.';
+      setTranscriptionError(msg);
+      showNotification('Chave da API Gemini necessária para transcrever sua voz.', 'warning');
+      setIsSettingsOpen(true);
+      return;
+    }
+
     setIsProcessing(true);
-    setProcessingStatus('Enviando áudio para processamento com Inteligência Artificial...');
+    setProcessingStatus('Preparando áudio para processamento com Inteligência Artificial...');
 
     try {
-      let result: AIProcessingResult;
-
-      if (profile.geminiApiKey && profile.geminiApiKey.trim() !== '') {
-        setProcessingStatus(`Transcrevendo e calibrando para ${sessionApproach.toUpperCase()}...`);
-        result = await processAudioWithGemini(
-          audioBlob,
-          profile.geminiApiKey,
-          profile.selectedModel || 'gemini-3.6-flash',
-          sessionApproach,
-          (status) => setProcessingStatus(status)
-        );
-      } else {
-        // Sem chave API configurada: simulação assistida com transcrição clínica
-        setProcessingStatus(`Processando áudio na abordagem ${sessionApproach.toUpperCase()}...`);
-        await new Promise((r) => setTimeout(r, 1600));
-
-        const demoKey =
-          sessionApproach === 'psicanalise'
-            ? 'psicanalise'
-            : sessionApproach === 'humanista'
-            ? 'humanista'
-            : sessionApproach === 'sistemica'
-            ? 'sistemica'
-            : 'ansiedade';
-
-        const demo = CLINICAL_DEMO_CASES[demoKey];
-        result = {
-          rawTranscription: demo.rawTranscription,
-          structuredNote: demo.structuredNote,
-          anxietyScore: demo.anxietyScore,
-          moodScore: demo.moodScore,
-        };
-
-        showNotification(
-          'Dica: Adicione sua Chave do Gemini em Configurações para processar sua voz real.',
-          'info'
-        );
-      }
+      setProcessingStatus(`Transcrevendo e calibrando para ${sessionApproach.toUpperCase()}...`);
+      const result = await processAudioWithGemini(
+        audioBlob,
+        profile.geminiApiKey,
+        profile.selectedModel || 'gemini-2.0-flash',
+        sessionApproach,
+        (status) => setProcessingStatus(status)
+      );
 
       const newSessionRecord: SessionRecord = {
         id: 'sess-' + Date.now(),
@@ -242,8 +226,10 @@ export const App: React.FC = () => {
       }, 300);
     } catch (err) {
       console.error('Erro no processamento do áudio:', err);
+      const errMsg = (err as Error).message || 'Falha na conexão com a IA.';
+      setTranscriptionError(errMsg);
       showNotification(
-        `Falha ao transcrever: ${(err as Error).message}. Verifique sua chave de API nas Configurações.`,
+        `Falha ao transcrever: ${errMsg}. Verifique sua chave de API nas Configurações.`,
         'warning'
       );
     } finally {
@@ -520,6 +506,10 @@ export const App: React.FC = () => {
             onAudioReady={handleAudioReady}
             onSelectDemoCase={handleSelectDemoCase}
             isProcessing={isProcessing}
+            processingStatus={processingStatus}
+            errorMessage={transcriptionError}
+            onClearError={() => setTranscriptionError(null)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
           />
         </div>
 
